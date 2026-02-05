@@ -73,7 +73,11 @@
         </div>
         <div class="control-item">
             <span class="icon">✋</span>
-            <span>Votre bras R6 est visible à droite</span>
+            <span>Bras R6 gauche et droit visibles</span>
+        </div>
+        <div class="control-item">
+            <span class="icon">🔪</span>
+            <span>Karambit dans la main droite</span>
         </div>
     </div>
 
@@ -132,54 +136,100 @@
         gridHelper.position.y = -2.35;
         scene.add(gridHelper);
         
-        // Création du bras R6
-        const armGroup = new THREE.Group();
+        // Matériau pour les bras R6
         const armMaterial = new THREE.MeshStandardMaterial({ 
             color: 0xffcc99,
             roughness: 0.5,
             metalness: 0.2
         });
         
-        // Épaule (sphère)
-        const shoulderGeometry = new THREE.SphereGeometry(0.25, 16, 16);
-        const shoulder = new THREE.Mesh(shoulderGeometry, armMaterial);
-        shoulder.position.y = 0.6;
-        shoulder.castShadow = true;
-        armGroup.add(shoulder);
+        // Fonction pour créer un bras R6 (bloc unique)
+        function createR6Arm() {
+            const armGeometry = new THREE.BoxGeometry(0.3, 1.5, 0.3);
+            const arm = new THREE.Mesh(armGeometry, armMaterial);
+            arm.castShadow = true;
+            return arm;
+        }
         
-        // Bras supérieur (cube)
-        const upperArmGeometry = new THREE.BoxGeometry(0.4, 1.2, 0.4);
-        const upperArm = new THREE.Mesh(upperArmGeometry, armMaterial);
-        upperArm.position.y = 0;
-        upperArm.castShadow = true;
-        armGroup.add(upperArm);
+        // BRAS DROIT (avec karambit)
+        const rightArmGroup = new THREE.Group();
+        const rightArm = createR6Arm();
+        rightArmGroup.add(rightArm);
         
-        // Coude (sphère)
-        const elbowGeometry = new THREE.SphereGeometry(0.22, 16, 16);
-        const elbow = new THREE.Mesh(elbowGeometry, armMaterial);
-        elbow.position.y = -0.6;
-        elbow.castShadow = true;
-        armGroup.add(elbow);
+        // Karambit
+        const karambitGroup = new THREE.Group();
         
-        // Avant-bras (cube)
-        const forearmGeometry = new THREE.BoxGeometry(0.35, 1.0, 0.35);
-        const forearm = new THREE.Mesh(forearmGeometry, armMaterial);
-        forearm.position.y = -1.2;
-        forearm.castShadow = true;
-        armGroup.add(forearm);
+        // Lame du karambit (courbée)
+        const bladeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xcccccc,
+            metalness: 0.9,
+            roughness: 0.2
+        });
         
-        // Main (cube)
-        const handGeometry = new THREE.BoxGeometry(0.3, 0.4, 0.3);
-        const hand = new THREE.Mesh(handGeometry, armMaterial);
-        hand.position.y = -1.8;
-        hand.castShadow = true;
-        armGroup.add(hand);
+        // Partie principale de la lame
+        const bladeGeometry = new THREE.BoxGeometry(0.05, 0.6, 0.15);
+        const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+        blade.position.set(0, -0.3, 0);
+        blade.rotation.z = 0.3;
+        karambitGroup.add(blade);
         
-        // Position du bras pour vue première personne (à droite de la caméra)
-        armGroup.position.set(0.8, -0.5, -1.5);
-        armGroup.rotation.y = -0.3;
+        // Pointe recourbée
+        const tipGeometry = new THREE.BoxGeometry(0.05, 0.2, 0.12);
+        const tip = new THREE.Mesh(tipGeometry, bladeMaterial);
+        tip.position.set(0.15, -0.5, 0);
+        tip.rotation.z = -0.5;
+        karambitGroup.add(tip);
         
-        scene.add(armGroup);
+        // Manche du karambit
+        const handleMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a1a,
+            roughness: 0.8,
+            metalness: 0.1
+        });
+        const handleGeometry = new THREE.BoxGeometry(0.08, 0.35, 0.12);
+        const handle = new THREE.Mesh(handleGeometry, handleMaterial);
+        handle.position.set(0, 0.1, 0);
+        karambitGroup.add(handle);
+        
+        // Anneau du karambit
+        const ringGeometry = new THREE.TorusGeometry(0.08, 0.02, 8, 16);
+        const ring = new THREE.Mesh(ringGeometry, handleMaterial);
+        ring.position.set(0, 0.35, 0);
+        ring.rotation.x = Math.PI / 2;
+        karambitGroup.add(ring);
+        
+        // Détails dorés sur le karambit
+        const goldMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xffd700,
+            metalness: 0.8,
+            roughness: 0.3
+        });
+        const accentGeometry = new THREE.BoxGeometry(0.09, 0.05, 0.13);
+        const accent = new THREE.Mesh(accentGeometry, goldMaterial);
+        accent.position.set(0, 0.05, 0);
+        karambitGroup.add(accent);
+        
+        // Position du karambit dans la main droite
+        karambitGroup.position.set(0.15, -0.9, 0);
+        karambitGroup.rotation.x = -Math.PI / 6;
+        karambitGroup.rotation.z = Math.PI / 8;
+        rightArmGroup.add(karambitGroup);
+        
+        // Position du bras droit
+        rightArmGroup.position.set(0.5, -0.3, -1.0);
+        rightArmGroup.rotation.x = -0.2;
+        
+        // BRAS GAUCHE
+        const leftArmGroup = new THREE.Group();
+        const leftArm = createR6Arm();
+        leftArmGroup.add(leftArm);
+        
+        // Position du bras gauche
+        leftArmGroup.position.set(-0.5, -0.3, -1.0);
+        leftArmGroup.rotation.x = -0.2;
+        
+        scene.add(rightArmGroup);
+        scene.add(leftArmGroup);
         
         // Contrôles première personne
         let mouseX = 0;
@@ -221,19 +271,23 @@
             
             if (keys['z'] || keys['w']) {
                 camera.position.add(forward.multiplyScalar(moveSpeed));
-                armGroup.position.add(forward.multiplyScalar(moveSpeed));
+                rightArmGroup.position.add(forward.multiplyScalar(moveSpeed));
+                leftArmGroup.position.add(forward.multiplyScalar(moveSpeed));
             }
             if (keys['s']) {
                 camera.position.sub(forward.multiplyScalar(moveSpeed));
-                armGroup.position.sub(forward.multiplyScalar(moveSpeed));
+                rightArmGroup.position.sub(forward.multiplyScalar(moveSpeed));
+                leftArmGroup.position.sub(forward.multiplyScalar(moveSpeed));
             }
             if (keys['q'] || keys['a']) {
                 camera.position.sub(right.multiplyScalar(moveSpeed));
-                armGroup.position.sub(right.multiplyScalar(moveSpeed));
+                rightArmGroup.position.sub(right.multiplyScalar(moveSpeed));
+                leftArmGroup.position.sub(right.multiplyScalar(moveSpeed));
             }
             if (keys['d']) {
                 camera.position.add(right.multiplyScalar(moveSpeed));
-                armGroup.position.add(right.multiplyScalar(moveSpeed));
+                rightArmGroup.position.add(right.multiplyScalar(moveSpeed));
+                leftArmGroup.position.add(right.multiplyScalar(moveSpeed));
             }
         }
         
@@ -247,10 +301,17 @@
             // Mouvement ZQSD
             updateMovement();
             
-            // Animation du bras (balancement subtil)
+            // Animation des bras (balancement de marche)
             const time = Date.now() * 0.001;
-            armGroup.rotation.z = Math.sin(time * 0.5) * 0.05;
-            armGroup.rotation.x = Math.sin(time * 0.3) * 0.03;
+            const walkSpeed = 2.0;
+            const walkIntensity = 0.08;
+            
+            // Balancement inverse pour les deux bras
+            rightArmGroup.rotation.x = -0.2 + Math.sin(time * walkSpeed) * walkIntensity;
+            leftArmGroup.rotation.x = -0.2 + Math.sin(time * walkSpeed + Math.PI) * walkIntensity;
+            
+            // Mouvement subtil du karambit
+            karambitGroup.rotation.z = Math.PI / 8 + Math.sin(time * 3) * 0.05;
             
             // Interpolation douce de la rotation de la caméra
             currentRotationX += (targetRotationX - currentRotationX) * 0.1;
@@ -260,8 +321,9 @@
             camera.rotation.y = currentRotationY;
             camera.rotation.x = currentRotationX;
             
-            // Le bras suit la caméra
-            armGroup.rotation.y = -0.3 + currentRotationY;
+            // Les bras suivent la rotation de la caméra
+            rightArmGroup.rotation.y = currentRotationY * 0.3;
+            leftArmGroup.rotation.y = currentRotationY * 0.3;
             
             renderer.render(scene, camera);
         }
