@@ -71,17 +71,22 @@
             <span class="icon">⌨️</span>
             <span>ZQSD / WASD pour bouger</span>
         </div>
+        <h3 style="margin: 15px 0 10px 0; color: #00d4ff; font-size: 18px;">Animations du Karambit:</h3>
         <div class="control-item">
-            <span class="icon">✋</span>
-            <span>Bras R6 attachés à la vue</span>
+            <span class="icon">🔍</span>
+            <span><strong>F</strong> - Inspection (360° rotate)</span>
         </div>
         <div class="control-item">
-            <span class="icon">🔪</span>
-            <span>Karambit avec animations fluides</span>
+            <span class="icon">🌀</span>
+            <span><strong>R</strong> - Spin rapide</span>
+        </div>
+        <div class="control-item">
+            <span class="icon">🎯</span>
+            <span><strong>E</strong> - Flip dans l'air</span>
         </div>
         <div class="control-item">
             <span class="icon">✨</span>
-            <span>Effets de balancement et brillance</span>
+            <span><strong>G</strong> - Twirl complexe</span>
         </div>
     </div>
 
@@ -277,8 +282,35 @@
         const keys = {};
         const moveSpeed = 0.1;
         
+        // Variables pour les animations du couteau
+        let currentAnimation = 'idle';
+        let animationProgress = 0;
+        let animationDuration = 0;
+        
         document.addEventListener('keydown', (e) => {
             keys[e.key.toLowerCase()] = true;
+            
+            // Animations du couteau
+            if (e.key.toLowerCase() === 'f' && currentAnimation === 'idle') {
+                currentAnimation = 'inspect';
+                animationProgress = 0;
+                animationDuration = 3.0; // 3 secondes
+            }
+            if (e.key.toLowerCase() === 'r' && currentAnimation === 'idle') {
+                currentAnimation = 'spin';
+                animationProgress = 0;
+                animationDuration = 1.5;
+            }
+            if (e.key.toLowerCase() === 'e' && currentAnimation === 'idle') {
+                currentAnimation = 'flip';
+                animationProgress = 0;
+                animationDuration = 1.2;
+            }
+            if (e.key.toLowerCase() === 'g' && currentAnimation === 'idle') {
+                currentAnimation = 'twirl';
+                animationProgress = 0;
+                animationDuration = 2.0;
+            }
         });
         
         document.addEventListener('keyup', (e) => {
@@ -311,16 +343,119 @@
             }
         }
         
+        // Fonction d'easing pour des animations fluides
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+        
+        function easeOutElastic(t) {
+            const c4 = (2 * Math.PI) / 3;
+            return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+        }
+        
+        // Réinitialiser la position du couteau
+        function resetKnifePosition() {
+            knifeGroup.position.set(0.28, -0.45, -0.55);
+            knifeGroup.rotation.set(-0.3, 0.2, 0.5);
+        }
+        
+        // Animations du couteau
+        function updateKnifeAnimation(deltaTime, time) {
+            if (currentAnimation === 'idle') {
+                // Animation idle normale
+                resetKnifePosition();
+                knifeGroup.rotation.y = 0.2 + Math.sin(time * 0.7) * 0.03;
+                knifeGroup.rotation.z = 0.5 + Math.sin(time * 0.9) * 0.02;
+                return;
+            }
+            
+            animationProgress += deltaTime;
+            const progress = Math.min(animationProgress / animationDuration, 1);
+            const eased = easeInOutCubic(progress);
+            
+            if (currentAnimation === 'inspect') {
+                // Animation d'inspection (F) - Tourne le couteau pour l'admirer
+                knifeGroup.position.x = 0.28 + Math.sin(progress * Math.PI * 2) * 0.15;
+                knifeGroup.position.y = -0.45 + Math.sin(progress * Math.PI) * 0.1;
+                knifeGroup.position.z = -0.55 + eased * 0.1;
+                
+                knifeGroup.rotation.x = -0.3 + Math.sin(progress * Math.PI * 2) * 0.5;
+                knifeGroup.rotation.y = 0.2 + progress * Math.PI * 4;
+                knifeGroup.rotation.z = 0.5 + Math.sin(progress * Math.PI * 2) * 0.3;
+                
+                // Animation du bras droit
+                rightArm.rotation.y = Math.sin(progress * Math.PI) * 0.3;
+                rightArm.rotation.z = Math.sin(progress * Math.PI) * 0.2;
+            }
+            
+            else if (currentAnimation === 'spin') {
+                // Animation de rotation rapide (R) - Spin around finger
+                const spinSpeed = progress * Math.PI * 6;
+                knifeGroup.position.x = 0.28;
+                knifeGroup.position.y = -0.45 + Math.sin(progress * Math.PI) * 0.05;
+                knifeGroup.position.z = -0.55;
+                
+                knifeGroup.rotation.x = -0.3;
+                knifeGroup.rotation.y = 0.2 + spinSpeed;
+                knifeGroup.rotation.z = 0.5;
+                
+                rightArm.rotation.x = Math.sin(progress * Math.PI) * 0.2;
+            }
+            
+            else if (currentAnimation === 'flip') {
+                // Animation de flip (E) - Flip in the air
+                const flipProgress = easeOutElastic(progress);
+                knifeGroup.position.x = 0.28 + Math.sin(progress * Math.PI) * 0.2;
+                knifeGroup.position.y = -0.45 + Math.sin(progress * Math.PI) * 0.3;
+                knifeGroup.position.z = -0.55 + Math.sin(progress * Math.PI) * 0.15;
+                
+                knifeGroup.rotation.x = -0.3 + progress * Math.PI * 2;
+                knifeGroup.rotation.y = 0.2;
+                knifeGroup.rotation.z = 0.5 + flipProgress * Math.PI * 2;
+                
+                rightArm.rotation.x = -Math.sin(progress * Math.PI) * 0.4;
+                rightArm.position.y = -0.3 + Math.sin(progress * Math.PI) * 0.1;
+            }
+            
+            else if (currentAnimation === 'twirl') {
+                // Animation de twirl (G) - Complex finger twirl
+                knifeGroup.position.x = 0.28 + Math.sin(progress * Math.PI * 3) * 0.1;
+                knifeGroup.position.y = -0.45 + Math.sin(progress * Math.PI * 2) * 0.15;
+                knifeGroup.position.z = -0.55 + eased * 0.05;
+                
+                knifeGroup.rotation.x = -0.3 + Math.sin(progress * Math.PI * 4) * 0.6;
+                knifeGroup.rotation.y = 0.2 + progress * Math.PI * 8;
+                knifeGroup.rotation.z = 0.5 + Math.cos(progress * Math.PI * 3) * 0.5;
+                
+                rightArm.rotation.y = Math.sin(progress * Math.PI * 2) * 0.2;
+                rightArm.rotation.z = Math.sin(progress * Math.PI * 2) * 0.15;
+            }
+            
+            // Fin de l'animation
+            if (progress >= 1) {
+                currentAnimation = 'idle';
+                animationProgress = 0;
+                resetKnifePosition();
+                rightArm.rotation.y = 0;
+                rightArm.rotation.z = 0;
+                rightArm.position.y = -0.3;
+            }
+        }
+        
         // Animation
         let currentRotationX = 0;
         let currentRotationY = 0;
         let bobPhase = 0;
         let isMoving = false;
+        let lastTime = Date.now();
         
         function animate() {
             requestAnimationFrame(animate);
             
-            const time = Date.now() * 0.001;
+            const currentTime = Date.now();
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            const time = currentTime * 0.001;
             
             // Détection du mouvement
             isMoving = keys['z'] || keys['w'] || keys['s'] || keys['q'] || keys['a'] || keys['d'];
@@ -338,8 +473,8 @@
             
             // === ANIMATIONS DU VIEWMODEL ===
             
-            // Balancement de marche (head bobbing)
-            if (isMoving) {
+            // Balancement de marche (head bobbing) - seulement si pas d'animation de couteau
+            if (isMoving && currentAnimation === 'idle') {
                 bobPhase += 0.15;
                 const bobY = Math.sin(bobPhase) * 0.015;
                 const bobX = Math.cos(bobPhase * 0.5) * 0.01;
@@ -349,7 +484,7 @@
                 // Balancement des bras pendant la marche
                 rightArm.rotation.x = Math.sin(bobPhase) * 0.1;
                 leftArm.rotation.x = Math.sin(bobPhase + Math.PI) * 0.1;
-            } else {
+            } else if (currentAnimation === 'idle') {
                 // Retour à la position de repos
                 viewmodelGroup.position.y += (0 - viewmodelGroup.position.y) * 0.1;
                 viewmodelGroup.position.x += (0 - viewmodelGroup.position.x) * 0.1;
@@ -357,15 +492,16 @@
                 leftArm.rotation.x += (0 - leftArm.rotation.x) * 0.1;
             }
             
-            // Balancement idle subtil (breathing effect)
-            const idleSwayY = Math.sin(time * 0.8) * 0.005;
-            const idleSwayX = Math.cos(time * 0.5) * 0.003;
-            viewmodelGroup.rotation.z = idleSwayX;
-            viewmodelGroup.rotation.x = idleSwayY;
+            // Balancement idle subtil (breathing effect) - seulement si pas d'animation
+            if (currentAnimation === 'idle') {
+                const idleSwayY = Math.sin(time * 0.8) * 0.005;
+                const idleSwayX = Math.cos(time * 0.5) * 0.003;
+                viewmodelGroup.rotation.z = idleSwayX;
+                viewmodelGroup.rotation.x = idleSwayY;
+            }
             
-            // Animation du couteau (rotation douce)
-            knifeGroup.rotation.y = Math.sin(time * 0.7) * 0.03;
-            knifeGroup.rotation.z = 0.5 + Math.sin(time * 0.9) * 0.02;
+            // Animation du couteau
+            updateKnifeAnimation(deltaTime, time);
             
             // Animation de reflet sur la lame
             const pulseIntensity = (Math.sin(time * 2) + 1) * 0.15;
