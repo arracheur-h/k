@@ -22,6 +22,142 @@
             height: 100vh;
         }
         
+        /* Menu principal */
+        #main-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s;
+        }
+        
+        #main-menu.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .menu-container {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00d4ff;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+        }
+        
+        .menu-title {
+            text-align: center;
+            color: #00d4ff;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+            letter-spacing: 3px;
+        }
+        
+        .menu-subtitle {
+            text-align: center;
+            color: #ffd700;
+            font-size: 20px;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        
+        .settings-section {
+            margin: 30px 0;
+        }
+        
+        .settings-title {
+            color: #00d4ff;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 10px;
+        }
+        
+        .setting-item {
+            margin: 20px 0;
+        }
+        
+        .setting-label {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .setting-value {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+        
+        .play-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #00d4ff, #0066ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .play-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+            background: linear-gradient(135deg, #00e4ff, #0077ff);
+        }
+        
+        .play-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Panneau d'info en jeu */
         .info-panel {
             position: absolute;
             top: 20px;
@@ -33,6 +169,11 @@
             backdrop-filter: blur(10px);
             max-width: 320px;
             z-index: 1000;
+            display: none;
+        }
+        
+        .info-panel.visible {
+            display: block;
         }
         
         .info-panel h2 {
@@ -57,12 +198,156 @@
             margin-right: 10px;
             font-size: 18px;
         }
+        
+        /* Menu pause (ESC) */
+        #pause-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        #pause-menu.visible {
+            display: flex;
+        }
+        
+        .pause-container {
+            background: rgba(26, 26, 46, 0.95);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .pause-title {
+            color: #00d4ff;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .menu-button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0, 212, 255, 0.2);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .menu-button:hover {
+            background: rgba(0, 212, 255, 0.4);
+            transform: translateX(5px);
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+    <!-- Menu principal -->
+    <div id="main-menu">
+        <div class="menu-container">
+            <h1 class="menu-title">⚔️ KARAMBIT FPS ⚔️</h1>
+            <p class="menu-subtitle">Premium Animations Experience</p>
+            
+            <div class="settings-section">
+                <h2 class="settings-title">⚙️ Paramètres</h2>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>📐 Champ de vision (FOV)</span>
+                        <span class="setting-value" id="fov-value">75°</span>
+                    </div>
+                    <input type="range" id="fov-slider" min="60" max="110" value="75" step="5">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>🖱️ Sensibilité souris</span>
+                        <span class="setting-value" id="sensitivity-value">1.0x</span>
+                    </div>
+                    <input type="range" id="sensitivity-slider" min="0.3" max="2.0" value="1.0" step="0.1">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>🎨 Qualité des ombres</span>
+                        <span class="setting-value" id="shadows-value">Activées</span>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="shadows-checkbox" checked>
+                        <label for="shadows-checkbox" style="color: white;">Ombres dynamiques</label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>ℹ️ Afficher les contrôles</span>
+                        <span class="setting-value" id="controls-value">Activé</span>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="controls-checkbox" checked>
+                        <label for="controls-checkbox" style="color: white;">Panneau d'aide</label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="play-button" id="play-button">🎮 JOUER 🎮</button>
+        </div>
+    </div>
+    
+    <!-- Menu pause (ESC) -->
+    <div id="pause-menu">
+        <div class="pause-container">
+            <h2 class="pause-title">⏸️ PAUSE</h2>
+            
+            <div class="settings-section">
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>📐 FOV</span>
+                        <span class="setting-value" id="fov-value-pause">75°</span>
+                    </div>
+                    <input type="range" id="fov-slider-pause" min="60" max="110" value="75" step="5">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>🖱️ Sensibilité</span>
+                        <span class="setting-value" id="sensitivity-value-pause">1.0x</span>
+                    </div>
+                    <input type="range" id="sensitivity-slider-pause" min="0.3" max="2.0" value="1.0" step="0.1">
+                </div>
+            </div>
+            
+            <button class="menu-button" id="resume-button">▶️ Reprendre</button>
+            <button class="menu-button" id="restart-button">🔄 Recommencer</button>
+        </div>
+    </div>
+    
     <div id="canvas-container"></div>
     
-    <div class="info-panel">
+    <div class="info-panel" id="info-panel">
         <h2>🎮 FPS Karambit Pro</h2>
         <div class="control-item">
             <span class="icon">🖱️</span>
@@ -71,6 +356,10 @@
         <div class="control-item">
             <span class="icon">⌨️</span>
             <span>ZQSD / WASD pour bouger</span>
+        </div>
+        <div class="control-item">
+            <span class="icon">⏸️</span>
+            <span>ESC pour pause/paramètres</span>
         </div>
         <h3>🎬 Animations Premium:</h3>
         <div class="control-item">
@@ -101,13 +390,127 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        // === GESTION DU MENU ET PARAMÈTRES ===
+        let gameStarted = false;
+        let isPaused = false;
+        let settings = {
+            fov: 75,
+            sensitivity: 1.0,
+            shadows: true,
+            showControls: true
+        };
+        
+        // Éléments du menu
+        const mainMenu = document.getElementById('main-menu');
+        const pauseMenu = document.getElementById('pause-menu');
+        const infoPanel = document.getElementById('info-panel');
+        const playButton = document.getElementById('play-button');
+        const resumeButton = document.getElementById('resume-button');
+        const restartButton = document.getElementById('restart-button');
+        
+        // Sliders menu principal
+        const fovSlider = document.getElementById('fov-slider');
+        const fovValue = document.getElementById('fov-value');
+        const sensitivitySlider = document.getElementById('sensitivity-slider');
+        const sensitivityValue = document.getElementById('sensitivity-value');
+        const shadowsCheckbox = document.getElementById('shadows-checkbox');
+        const shadowsValue = document.getElementById('shadows-value');
+        const controlsCheckbox = document.getElementById('controls-checkbox');
+        const controlsValue = document.getElementById('controls-value');
+        
+        // Sliders menu pause
+        const fovSliderPause = document.getElementById('fov-slider-pause');
+        const fovValuePause = document.getElementById('fov-value-pause');
+        const sensitivitySliderPause = document.getElementById('sensitivity-slider-pause');
+        const sensitivityValuePause = document.getElementById('sensitivity-value-pause');
+        
+        // Event listeners pour les sliders du menu principal
+        fovSlider.addEventListener('input', (e) => {
+            settings.fov = parseInt(e.target.value);
+            fovValue.textContent = settings.fov + '°';
+            fovSliderPause.value = settings.fov;
+            fovValuePause.textContent = settings.fov + '°';
+        });
+        
+        sensitivitySlider.addEventListener('input', (e) => {
+            settings.sensitivity = parseFloat(e.target.value);
+            sensitivityValue.textContent = settings.sensitivity.toFixed(1) + 'x';
+            sensitivitySliderPause.value = settings.sensitivity;
+            sensitivityValuePause.textContent = settings.sensitivity.toFixed(1) + 'x';
+        });
+        
+        shadowsCheckbox.addEventListener('change', (e) => {
+            settings.shadows = e.target.checked;
+            shadowsValue.textContent = settings.shadows ? 'Activées' : 'Désactivées';
+        });
+        
+        controlsCheckbox.addEventListener('change', (e) => {
+            settings.showControls = e.target.checked;
+            controlsValue.textContent = settings.showControls ? 'Activé' : 'Désactivé';
+        });
+        
+        // Event listeners pour les sliders du menu pause
+        fovSliderPause.addEventListener('input', (e) => {
+            settings.fov = parseInt(e.target.value);
+            fovValuePause.textContent = settings.fov + '°';
+            fovSlider.value = settings.fov;
+            fovValue.textContent = settings.fov + '°';
+            if (camera) {
+                targetFOV = settings.fov;
+            }
+        });
+        
+        sensitivitySliderPause.addEventListener('input', (e) => {
+            settings.sensitivity = parseFloat(e.target.value);
+            sensitivityValuePause.textContent = settings.sensitivity.toFixed(1) + 'x';
+            sensitivitySlider.value = settings.sensitivity;
+            sensitivityValue.textContent = settings.sensitivity.toFixed(1) + 'x';
+        });
+        
+        // Bouton jouer
+        playButton.addEventListener('click', () => {
+            gameStarted = true;
+            mainMenu.classList.add('hidden');
+            if (settings.showControls) {
+                infoPanel.classList.add('visible');
+            }
+            // Verrouiller le pointeur pour un vrai FPS
+            document.getElementById('canvas-container').requestPointerLock();
+        });
+        
+        // Bouton reprendre
+        resumeButton.addEventListener('click', () => {
+            isPaused = false;
+            pauseMenu.classList.remove('visible');
+            document.getElementById('canvas-container').requestPointerLock();
+        });
+        
+        // Bouton recommencer
+        restartButton.addEventListener('click', () => {
+            location.reload();
+        });
+        
+        // Gestion de la touche ESC pour le menu pause
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && gameStarted) {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    pauseMenu.classList.add('visible');
+                    document.exitPointerLock();
+                } else {
+                    pauseMenu.classList.remove('visible');
+                    document.getElementById('canvas-container').requestPointerLock();
+                }
+            }
+        });
+        
         // Configuration de la scène
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a1a);
         
         // Caméra première personne
         const camera = new THREE.PerspectiveCamera(
-            75,
+            settings.fov,
             window.innerWidth / window.innerHeight,
             0.1,
             1000
@@ -276,12 +679,19 @@
         let targetRotationX = 0;
         let targetRotationY = 0;
         
+        // Gestion du mouvement de la souris avec pointer lock
         document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-            
-            targetRotationY = -mouseX * Math.PI * 0.5;
-            targetRotationX = mouseY * Math.PI * 0.3;
+            if (!isPaused && document.pointerLockElement) {
+                // Utiliser movementX/Y pour un vrai FPS
+                const movementX = e.movementX || 0;
+                const movementY = e.movementY || 0;
+                
+                targetRotationY -= movementX * 0.002 * settings.sensitivity;
+                targetRotationX -= movementY * 0.002 * settings.sensitivity;
+                
+                // Limiter la rotation verticale
+                targetRotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, targetRotationX));
+            }
         });
         
         const keys = {};
@@ -290,10 +700,12 @@
         let currentAnimation = 'idle';
         let animationProgress = 0;
         let animationDuration = 0;
-        let cameraFOV = 75;
-        let targetFOV = 75;
+        let cameraFOV = settings.fov;
+        let targetFOV = settings.fov;
         
         document.addEventListener('keydown', (e) => {
+            if (isPaused) return; // Ignorer les touches si en pause
+            
             keys[e.key.toLowerCase()] = true;
             
             if (e.key.toLowerCase() === 'f' && currentAnimation === 'idle') {
@@ -388,7 +800,7 @@
                 resetKnifePosition();
                 knifeGroup.rotation.y = 0.4 + Math.sin(time * 0.7) * 0.02;
                 knifeGroup.rotation.z = 0.3 + Math.sin(time * 0.9) * 0.015;
-                targetFOV = 75;
+                targetFOV = settings.fov; // Utiliser le FOV des paramètres
                 return;
             }
             
@@ -534,7 +946,7 @@
                 leftArm.position.set(-0.25, -0.3, -0.5);
                 viewmodelGroup.position.set(0, 0, 0);
                 viewmodelGroup.rotation.set(0, 0, 0);
-                targetFOV = 75;
+                targetFOV = settings.fov; // Retour au FOV des paramètres
             }
         }
         
@@ -553,6 +965,12 @@
             lastTime = currentTime;
             const time = currentTime * 0.001;
             
+            // Arrêter les animations si en pause
+            if (isPaused) {
+                renderer.render(scene, camera);
+                return;
+            }
+            
             isMoving = keys['z'] || keys['w'] || keys['s'] || keys['q'] || keys['a'] || keys['d'];
             
             updateMovement();
@@ -567,6 +985,9 @@
             cameraFOV += (targetFOV - cameraFOV) * 0.1;
             camera.fov = cameraFOV;
             camera.updateProjectionMatrix();
+            
+            // Appliquer les paramètres d'ombres
+            renderer.shadowMap.enabled = settings.shadows;
             
             if (isMoving && currentAnimation === 'idle') {
                 bobPhase += 0.15;
