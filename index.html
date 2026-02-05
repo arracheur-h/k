@@ -259,9 +259,9 @@
         rivet2.position.set(0, 0.08, -0.042);
         knifeGroup.add(rivet2);
         
-        // Position du couteau dans la main droite (plus haut et mieux visible)
-        knifeGroup.position.set(0.28, -0.25, -0.5);
-        knifeGroup.rotation.set(-0.2, 0.3, 0.4);
+        // Position du couteau dans la main droite (mieux tenu, pas dans le bras)
+        knifeGroup.position.set(0.35, -0.28, -0.45);
+        knifeGroup.rotation.set(-0.1, 0.4, 0.3);
         viewmodelGroup.add(knifeGroup);
         
         // Contrôles première personne
@@ -274,8 +274,9 @@
             mouseX = (e.clientX / window.innerWidth) * 2 - 1;
             mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
             
-            targetRotationY = mouseX * Math.PI * 0.5;
-            targetRotationX = mouseY * Math.PI * 0.3;
+            // Inversé pour contrôles naturels
+            targetRotationY = -mouseX * Math.PI * 0.5;
+            targetRotationX = -mouseY * Math.PI * 0.3;
         });
         
         // Mouvement avec les touches ZQSD / WASD
@@ -294,22 +295,22 @@
             if (e.key.toLowerCase() === 'f' && currentAnimation === 'idle') {
                 currentAnimation = 'inspect';
                 animationProgress = 0;
-                animationDuration = 3.5; // Plus long pour animation fluide
+                animationDuration = 4.0; // Plus long pour montrer tous les détails
             }
             if (e.key.toLowerCase() === 'r' && currentAnimation === 'idle') {
                 currentAnimation = 'spin';
                 animationProgress = 0;
-                animationDuration = 1.8;
+                animationDuration = 2.0;
             }
             if (e.key.toLowerCase() === 'e' && currentAnimation === 'idle') {
                 currentAnimation = 'flip';
                 animationProgress = 0;
-                animationDuration = 1.4;
+                animationDuration = 1.6;
             }
             if (e.key.toLowerCase() === 'g' && currentAnimation === 'idle') {
                 currentAnimation = 'twirl';
                 animationProgress = 0;
-                animationDuration = 2.5;
+                animationDuration = 2.8;
             }
         });
         
@@ -355,8 +356,8 @@
         
         // Réinitialiser la position du couteau
         function resetKnifePosition() {
-            knifeGroup.position.set(0.28, -0.25, -0.5);
-            knifeGroup.rotation.set(-0.2, 0.3, 0.4);
+            knifeGroup.position.set(0.35, -0.28, -0.45);
+            knifeGroup.rotation.set(-0.1, 0.4, 0.3);
         }
         
         // Fonction d'interpolation pour transitions fluides
@@ -364,13 +365,13 @@
             return start + (end - start) * t;
         }
         
-        // Animations du couteau avec coordination bras-couteau
+        // Animations du couteau avec coordination bras-couteau améliorée
         function updateKnifeAnimation(deltaTime, time) {
             if (currentAnimation === 'idle') {
                 // Animation idle normale
                 resetKnifePosition();
-                knifeGroup.rotation.y = 0.3 + Math.sin(time * 0.7) * 0.02;
-                knifeGroup.rotation.z = 0.4 + Math.sin(time * 0.9) * 0.015;
+                knifeGroup.rotation.y = 0.4 + Math.sin(time * 0.7) * 0.02;
+                knifeGroup.rotation.z = 0.3 + Math.sin(time * 0.9) * 0.015;
                 return;
             }
             
@@ -379,142 +380,202 @@
             const eased = easeInOutCubic(progress);
             
             if (currentAnimation === 'inspect') {
-                // INSPECT (F) - Tourne doucement le couteau devant les yeux
-                // Phase 1: Amener le couteau au centre (0-0.33)
-                // Phase 2: Rotation complète (0.33-0.77)
-                // Phase 3: Retour position (0.77-1)
+                // INSPECT (F) - Inspection professionnelle avec les deux mains
+                // Phase 1: Ramener au centre (0-0.25)
+                // Phase 2: Rotation lente (0.25-0.75)
+                // Phase 3: Retour (0.75-1)
                 
-                if (progress < 0.33) {
-                    const phase = progress / 0.33;
+                if (progress < 0.25) {
+                    const phase = progress / 0.25;
                     const phaseEased = easeInOutCubic(phase);
                     
-                    // Ramener le couteau vers le centre et plus haut
-                    knifeGroup.position.x = smoothLerp(0.28, 0, phaseEased);
-                    knifeGroup.position.y = smoothLerp(-0.25, 0, phaseEased);
-                    knifeGroup.position.z = smoothLerp(-0.5, -0.35, phaseEased);
+                    // Ramener le couteau vers le centre, plus haut et proche
+                    knifeGroup.position.x = smoothLerp(0.35, 0.05, phaseEased);
+                    knifeGroup.position.y = smoothLerp(-0.28, -0.05, phaseEased);
+                    knifeGroup.position.z = smoothLerp(-0.45, -0.3, phaseEased);
                     
-                    knifeGroup.rotation.x = smoothLerp(-0.2, 0.5, phaseEased);
-                    knifeGroup.rotation.y = smoothLerp(0.3, 0, phaseEased);
-                    knifeGroup.rotation.z = smoothLerp(0.4, 0, phaseEased);
+                    knifeGroup.rotation.x = smoothLerp(-0.1, 0.4, phaseEased);
+                    knifeGroup.rotation.y = smoothLerp(0.4, 0.2, phaseEased);
+                    knifeGroup.rotation.z = smoothLerp(0.3, 0.1, phaseEased);
                     
-                    // Les deux bras se rapprochent
-                    rightArm.position.x = smoothLerp(0.25, 0.15, phaseEased);
-                    leftArm.position.x = smoothLerp(-0.25, -0.15, phaseEased);
-                    rightArm.rotation.y = smoothLerp(0, -0.3, phaseEased);
-                    leftArm.rotation.y = smoothLerp(0, 0.3, phaseEased);
+                    // Bras droit se rapproche
+                    rightArm.position.x = smoothLerp(0.25, 0.18, phaseEased);
+                    rightArm.position.z = smoothLerp(-0.5, -0.4, phaseEased);
+                    rightArm.rotation.y = smoothLerp(0, -0.35, phaseEased);
+                    rightArm.rotation.x = smoothLerp(0, -0.15, phaseEased);
                     
-                } else if (progress < 0.77) {
-                    const phase = (progress - 0.33) / 0.44;
+                    // Bras gauche vient soutenir
+                    leftArm.position.x = smoothLerp(-0.25, -0.18, phaseEased);
+                    leftArm.position.z = smoothLerp(-0.5, -0.4, phaseEased);
+                    leftArm.rotation.y = smoothLerp(0, 0.35, phaseEased);
+                    leftArm.rotation.x = smoothLerp(0, -0.15, phaseEased);
                     
-                    // Rotation lente et fluide au centre
-                    knifeGroup.position.x = 0;
-                    knifeGroup.position.y = 0;
-                    knifeGroup.position.z = -0.35;
+                } else if (progress < 0.75) {
+                    const phase = (progress - 0.25) / 0.5;
                     
-                    const rotations = phase * Math.PI * 3; // 1.5 tours complets
-                    knifeGroup.rotation.x = 0.5 + Math.sin(rotations) * 0.3;
-                    knifeGroup.rotation.y = rotations;
-                    knifeGroup.rotation.z = Math.cos(rotations * 0.5) * 0.2;
+                    // Position stable au centre
+                    knifeGroup.position.x = 0.05;
+                    knifeGroup.position.y = -0.05;
+                    knifeGroup.position.z = -0.3;
                     
-                    // Bras stabilisés
-                    rightArm.position.x = 0.15;
-                    leftArm.position.x = -0.15;
-                    rightArm.rotation.y = -0.3 + Math.sin(rotations) * 0.1;
-                    leftArm.rotation.y = 0.3 - Math.sin(rotations) * 0.1;
+                    // Rotation fluide pour admirer le couteau
+                    const rotations = phase * Math.PI * 2.5;
+                    knifeGroup.rotation.x = 0.4 + Math.sin(rotations * 0.8) * 0.25;
+                    knifeGroup.rotation.y = 0.2 + rotations;
+                    knifeGroup.rotation.z = 0.1 + Math.cos(rotations * 0.6) * 0.2;
+                    
+                    // Bras stabilisés avec micro-mouvements
+                    rightArm.position.x = 0.18;
+                    rightArm.position.z = -0.4;
+                    rightArm.rotation.y = -0.35 + Math.sin(rotations) * 0.08;
+                    rightArm.rotation.x = -0.15 + Math.cos(rotations * 0.5) * 0.05;
+                    
+                    leftArm.position.x = -0.18;
+                    leftArm.position.z = -0.4;
+                    leftArm.rotation.y = 0.35 - Math.sin(rotations) * 0.08;
+                    leftArm.rotation.x = -0.15 + Math.cos(rotations * 0.5) * 0.05;
                     
                 } else {
-                    const phase = (progress - 0.77) / 0.23;
+                    const phase = (progress - 0.75) / 0.25;
                     const phaseEased = easeInOutCubic(phase);
                     
-                    // Retour position initiale
-                    knifeGroup.position.x = smoothLerp(0, 0.28, phaseEased);
-                    knifeGroup.position.y = smoothLerp(0, -0.25, phaseEased);
-                    knifeGroup.position.z = smoothLerp(-0.35, -0.5, phaseEased);
+                    // Retour position initiale fluide
+                    knifeGroup.position.x = smoothLerp(0.05, 0.35, phaseEased);
+                    knifeGroup.position.y = smoothLerp(-0.05, -0.28, phaseEased);
+                    knifeGroup.position.z = smoothLerp(-0.3, -0.45, phaseEased);
                     
-                    knifeGroup.rotation.x = smoothLerp(0.5, -0.2, phaseEased);
-                    knifeGroup.rotation.y = smoothLerp(Math.PI * 3 * 0.44, 0.3, phaseEased);
-                    knifeGroup.rotation.z = smoothLerp(0, 0.4, phaseEased);
+                    const finalRotY = Math.PI * 2.5 * 0.5 + 0.2;
+                    knifeGroup.rotation.x = smoothLerp(0.4, -0.1, phaseEased);
+                    knifeGroup.rotation.y = smoothLerp(finalRotY, 0.4, phaseEased);
+                    knifeGroup.rotation.z = smoothLerp(0.1, 0.3, phaseEased);
                     
-                    rightArm.position.x = smoothLerp(0.15, 0.25, phaseEased);
-                    leftArm.position.x = smoothLerp(-0.15, -0.25, phaseEased);
-                    rightArm.rotation.y = smoothLerp(-0.3, 0, phaseEased);
-                    leftArm.rotation.y = smoothLerp(0.3, 0, phaseEased);
+                    rightArm.position.x = smoothLerp(0.18, 0.25, phaseEased);
+                    rightArm.position.z = smoothLerp(-0.4, -0.5, phaseEased);
+                    rightArm.rotation.y = smoothLerp(-0.35, 0, phaseEased);
+                    rightArm.rotation.x = smoothLerp(-0.15, 0, phaseEased);
+                    
+                    leftArm.position.x = smoothLerp(-0.18, -0.25, phaseEased);
+                    leftArm.position.z = smoothLerp(-0.4, -0.5, phaseEased);
+                    leftArm.rotation.y = smoothLerp(0.35, 0, phaseEased);
+                    leftArm.rotation.x = smoothLerp(-0.15, 0, phaseEased);
                 }
             }
             
             else if (currentAnimation === 'spin') {
-                // SPIN (R) - Spin rapide avec mouvement du bras
-                const spinRotations = easeOutElastic(progress) * Math.PI * 8;
+                // SPIN (R) - Spin rapide avec contrôle du poignet
+                const spinRotations = easeOutElastic(progress) * Math.PI * 10;
                 
-                // Mouvement circulaire du couteau
-                const radius = 0.08 * Math.sin(progress * Math.PI);
-                knifeGroup.position.x = 0.28 + Math.cos(spinRotations * 2) * radius;
-                knifeGroup.position.y = -0.25 + Math.sin(progress * Math.PI) * 0.08;
-                knifeGroup.position.z = -0.5 + Math.sin(spinRotations * 2) * radius;
+                // Petit mouvement circulaire pendant le spin
+                const radius = 0.06 * Math.sin(progress * Math.PI);
+                knifeGroup.position.x = 0.35 + Math.cos(spinRotations * 3) * radius;
+                knifeGroup.position.y = -0.28 + Math.sin(progress * Math.PI) * 0.06;
+                knifeGroup.position.z = -0.45 + Math.sin(spinRotations * 2) * radius * 0.5;
                 
-                knifeGroup.rotation.x = -0.2 + Math.sin(spinRotations) * 0.3;
-                knifeGroup.rotation.y = 0.3 + spinRotations;
-                knifeGroup.rotation.z = 0.4 + Math.cos(spinRotations * 0.5) * 0.2;
+                // Rotation principale sur Y avec oscillations sur X et Z
+                knifeGroup.rotation.x = -0.1 + Math.sin(spinRotations * 1.2) * 0.25;
+                knifeGroup.rotation.y = 0.4 + spinRotations;
+                knifeGroup.rotation.z = 0.3 + Math.cos(spinRotations * 0.8) * 0.2;
                 
-                // Bras droit accompagne le mouvement
-                rightArm.rotation.x = Math.sin(progress * Math.PI) * 0.3;
-                rightArm.rotation.z = -Math.sin(progress * Math.PI) * 0.2;
-                rightArm.position.y = -0.3 + Math.sin(progress * Math.PI) * 0.05;
+                // Mouvement de poignet du bras droit
+                rightArm.rotation.x = Math.sin(progress * Math.PI) * 0.35;
+                rightArm.rotation.z = -Math.sin(progress * Math.PI) * 0.25;
+                rightArm.position.y = -0.3 + Math.sin(progress * Math.PI) * 0.08;
+                rightArm.position.x = 0.25 + Math.cos(progress * Math.PI * 2) * 0.03;
+                
+                // Bras gauche en contrepoids
+                leftArm.rotation.x = -Math.sin(progress * Math.PI) * 0.15;
             }
             
             else if (currentAnimation === 'flip') {
-                // FLIP (E) - Flip élégant avec catch
+                // FLIP (E) - Flip vertical avec lancer et catch propre
                 const parabola = Math.sin(progress * Math.PI);
+                const isThrow = progress < 0.4;
+                const isFlight = progress >= 0.4 && progress < 0.7;
+                const isCatch = progress >= 0.7;
                 
-                // Trajectoire parabolique
-                knifeGroup.position.x = 0.28 - progress * 0.15;
-                knifeGroup.position.y = -0.25 + parabola * 0.4;
-                knifeGroup.position.z = -0.5 + eased * 0.1;
-                
-                // Rotation pendant le vol
-                knifeGroup.rotation.x = -0.2 + progress * Math.PI * 3;
-                knifeGroup.rotation.y = 0.3 + parabola * 0.5;
-                knifeGroup.rotation.z = 0.4 + progress * Math.PI * 2;
-                
-                // Bras lance puis rattrape
-                if (progress < 0.5) {
-                    // Phase de lancer
-                    const throwPhase = progress * 2;
-                    rightArm.rotation.x = -throwPhase * 0.6;
-                    rightArm.position.y = -0.3 - throwPhase * 0.15;
-                    leftArm.rotation.x = throwPhase * 0.2;
+                if (isThrow) {
+                    // Phase de lancer (0-0.4)
+                    const throwPhase = progress / 0.4;
+                    const throwEased = easeInOutCubic(throwPhase);
+                    
+                    knifeGroup.position.x = 0.35 - throwEased * 0.1;
+                    knifeGroup.position.y = -0.28 + throwEased * 0.15;
+                    knifeGroup.position.z = -0.45 + throwEased * 0.05;
+                    
+                    knifeGroup.rotation.x = -0.1 + throwEased * 0.8;
+                    knifeGroup.rotation.y = 0.4;
+                    knifeGroup.rotation.z = 0.3 + throwEased * 0.3;
+                    
+                    rightArm.rotation.x = -throwEased * 0.7;
+                    rightArm.position.y = -0.3 - throwEased * 0.2;
+                    
+                } else if (isFlight) {
+                    // Phase de vol (0.4-0.7)
+                    const flightPhase = (progress - 0.4) / 0.3;
+                    
+                    knifeGroup.position.x = 0.25 + Math.sin(flightPhase * Math.PI) * 0.08;
+                    knifeGroup.position.y = -0.13 + parabola * 0.35;
+                    knifeGroup.position.z = -0.4;
+                    
+                    // Rotation complète pendant le vol
+                    knifeGroup.rotation.x = 0.7 + flightPhase * Math.PI * 3;
+                    knifeGroup.rotation.y = 0.4 + flightPhase * Math.PI * 0.5;
+                    knifeGroup.rotation.z = 0.6 + flightPhase * Math.PI * 2;
+                    
+                    // Bras se prépare à attraper
+                    rightArm.rotation.x = -0.7 + flightPhase * 0.4;
+                    rightArm.position.y = -0.5 + flightPhase * 0.1;
+                    
                 } else {
-                    // Phase de catch
-                    const catchPhase = (progress - 0.5) * 2;
-                    rightArm.rotation.x = -0.6 + catchPhase * 0.6;
-                    rightArm.position.y = -0.45 + catchPhase * 0.15;
-                    leftArm.rotation.x = 0.2 - catchPhase * 0.2;
+                    // Phase de catch (0.7-1)
+                    const catchPhase = (progress - 0.7) / 0.3;
+                    const catchEased = easeInOutCubic(catchPhase);
+                    
+                    knifeGroup.position.x = smoothLerp(0.25, 0.35, catchEased);
+                    knifeGroup.position.y = smoothLerp(0.22, -0.28, catchEased);
+                    knifeGroup.position.z = smoothLerp(-0.4, -0.45, catchEased);
+                    
+                    const finalRotX = Math.PI * 3 * 0.3 + 0.7;
+                    knifeGroup.rotation.x = smoothLerp(finalRotX, -0.1, catchEased);
+                    knifeGroup.rotation.y = smoothLerp(0.4 + Math.PI * 0.15, 0.4, catchEased);
+                    knifeGroup.rotation.z = smoothLerp(0.6 + Math.PI * 0.6, 0.3, catchEased);
+                    
+                    rightArm.rotation.x = smoothLerp(-0.3, 0, catchEased);
+                    rightArm.position.y = smoothLerp(-0.4, -0.3, catchEased);
                 }
+                
+                // Bras gauche réagit
+                leftArm.rotation.x = parabola * 0.25;
+                leftArm.position.y = -0.3 + parabola * 0.05;
             }
             
             else if (currentAnimation === 'twirl') {
-                // TWIRL (G) - Twirl complexe autour du doigt avec style
-                const twirls = progress * Math.PI * 6;
-                const wave = Math.sin(progress * Math.PI * 3);
+                // TWIRL (G) - Twirl complexe avec mouvement en spirale
+                const twirls = progress * Math.PI * 8;
+                const spiral = progress * Math.PI * 2;
                 
-                // Mouvement en 8
-                knifeGroup.position.x = 0.28 + Math.sin(twirls) * 0.12;
-                knifeGroup.position.y = -0.25 + Math.cos(twirls * 2) * 0.1;
-                knifeGroup.position.z = -0.5 + wave * 0.08;
+                // Mouvement en spirale élégante
+                const spiralRadius = 0.1 * Math.sin(progress * Math.PI);
+                knifeGroup.position.x = 0.35 + Math.cos(spiral) * spiralRadius;
+                knifeGroup.position.y = -0.28 + Math.sin(spiral) * spiralRadius * 0.8;
+                knifeGroup.position.z = -0.45 + Math.sin(twirls * 0.5) * 0.08;
                 
-                // Rotations multiples fluides
-                knifeGroup.rotation.x = -0.2 + Math.sin(twirls * 1.5) * 0.6;
-                knifeGroup.rotation.y = 0.3 + twirls * 1.5;
-                knifeGroup.rotation.z = 0.4 + Math.cos(twirls * 0.7) * 0.5;
+                // Rotations multiples coordonnées
+                knifeGroup.rotation.x = -0.1 + Math.sin(twirls * 1.3) * 0.7;
+                knifeGroup.rotation.y = 0.4 + twirls * 1.2;
+                knifeGroup.rotation.z = 0.3 + Math.cos(twirls * 0.9) * 0.6;
                 
-                // Mouvement de poignet élégant
-                rightArm.rotation.x = wave * 0.25;
-                rightArm.rotation.y = Math.sin(twirls * 0.5) * 0.3;
-                rightArm.rotation.z = Math.cos(twirls * 0.3) * 0.2;
+                // Mouvement de poignet fluide et élégant
+                rightArm.rotation.x = Math.sin(spiral) * 0.3;
+                rightArm.rotation.y = Math.sin(twirls * 0.4) * 0.35;
+                rightArm.rotation.z = Math.cos(twirls * 0.3) * 0.25;
+                rightArm.position.x = 0.25 + Math.sin(spiral) * 0.04;
+                rightArm.position.y = -0.3 + Math.cos(spiral) * 0.05;
                 
-                // Bras gauche en contrepoint
-                leftArm.rotation.y = -wave * 0.2;
-                leftArm.rotation.x = Math.sin(twirls * 0.3) * 0.15;
+                // Bras gauche fait le contrepoint
+                leftArm.rotation.x = Math.sin(twirls * 0.35) * 0.2;
+                leftArm.rotation.y = -Math.cos(spiral) * 0.25;
+                leftArm.position.y = -0.3 - Math.sin(spiral) * 0.03;
             }
             
             // Fin de l'animation avec reset fluide
