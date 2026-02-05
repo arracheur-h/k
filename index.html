@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPS Karambit Pro</title>
+    <title>Karambit Rivals - Ultra Realistic FPS</title>
     <style>
         * {
             margin: 0;
@@ -268,8 +268,8 @@
     <!-- Menu principal -->
     <div id="main-menu">
         <div class="menu-container">
-            <h1 class="menu-title">⚔️ KARAMBIT FPS ⚔️</h1>
-            <p class="menu-subtitle">Premium Animations Experience</p>
+            <h1 class="menu-title">⚔️ KARAMBIT RIVALS ⚔️</h1>
+            <p class="menu-subtitle">Ultra-Realistic FPS Experience</p>
             
             <div class="settings-section">
                 <h2 class="settings-title">⚙️ Paramètres</h2>
@@ -348,7 +348,7 @@
     <div id="canvas-container"></div>
     
     <div class="info-panel" id="info-panel">
-        <h2>🎮 FPS Karambit Pro</h2>
+        <h2>⚔️ Karambit Rivals</h2>
         <div class="control-item">
             <span class="icon">🖱️</span>
             <span>Souris pour regarder autour</span>
@@ -506,7 +506,48 @@
         
         // Configuration de la scène
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a1a);
+        
+        // === SKYBOX MAGNIFIQUE ===
+        // Gradient de ciel réaliste
+        const vertexShader = `
+            varying vec3 vWorldPosition;
+            void main() {
+                vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                vWorldPosition = worldPosition.xyz;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+        
+        const fragmentShader = `
+            uniform vec3 topColor;
+            uniform vec3 bottomColor;
+            uniform float offset;
+            uniform float exponent;
+            varying vec3 vWorldPosition;
+            
+            void main() {
+                float h = normalize(vWorldPosition + offset).y;
+                gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+            }
+        `;
+        
+        const skyGeo = new THREE.SphereGeometry(500, 32, 15);
+        const skyMat = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: {
+                topColor: { value: new THREE.Color(0x0077ff) }, // Bleu ciel
+                bottomColor: { value: new THREE.Color(0xff6b35) }, // Orange sunset
+                offset: { value: 33 },
+                exponent: { value: 0.6 }
+            },
+            side: THREE.BackSide
+        });
+        const sky = new THREE.Mesh(skyGeo, skyMat);
+        scene.add(sky);
+        
+        // Fog pour plus de profondeur
+        scene.fog = new THREE.Fog(0x1a1a2e, 10, 100);
         
         // Caméra première personne
         const camera = new THREE.PerspectiveCamera(
@@ -524,35 +565,105 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
         
-        // Lumières
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        // Lumières améliorées pour un rendu réaliste
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
         
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 5, 5);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
+        // Lumière principale (soleil)
+        const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.2);
+        sunLight.position.set(10, 15, 5);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 50;
+        scene.add(sunLight);
         
-        const pointLight = new THREE.PointLight(0xffffff, 0.5);
-        pointLight.position.set(-5, 3, -5);
-        scene.add(pointLight);
+        // Lumière d'appoint pour le couteau
+        const knifeLight = new THREE.PointLight(0x00d4ff, 0.5, 3);
+        knifeLight.position.set(0.5, 0, -0.3);
+        scene.add(knifeLight);
         
-        // Base plate
-        const platformGeometry = new THREE.BoxGeometry(8, 0.3, 8);
+        // Rim light pour effet cinématique
+        const rimLight = new THREE.DirectionalLight(0x4466ff, 0.8);
+        rimLight.position.set(-5, 3, -5);
+        scene.add(rimLight);
+        
+        // Base plate améliorée
+        const platformGeometry = new THREE.BoxGeometry(12, 0.5, 12);
         const platformMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x4a4a4a,
-            roughness: 0.7,
-            metalness: 0.3
+            color: 0x2a2a3e,
+            roughness: 0.4,
+            metalness: 0.6,
+            emissive: 0x0a0a1e,
+            emissiveIntensity: 0.2
         });
         const platform = new THREE.Mesh(platformGeometry, platformMaterial);
         platform.position.y = -2.5;
         platform.receiveShadow = true;
         scene.add(platform);
         
-        // Grille
-        const gridHelper = new THREE.GridHelper(10, 10, 0x666666, 0x444444);
-        gridHelper.position.y = -2.35;
+        // Bordures de la plateforme (effet néon)
+        const borderMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00d4ff,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        // Bordures des 4 côtés
+        const border1 = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.1, 0.1), borderMaterial);
+        border1.position.set(0, -2.25, 6);
+        scene.add(border1);
+        
+        const border2 = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.1, 0.1), borderMaterial);
+        border2.position.set(0, -2.25, -6);
+        scene.add(border2);
+        
+        const border3 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 12), borderMaterial);
+        border3.position.set(6, -2.25, 0);
+        scene.add(border3);
+        
+        const border4 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 12), borderMaterial);
+        border4.position.set(-6, -2.25, 0);
+        scene.add(border4);
+        
+        // Grille stylée
+        const gridHelper = new THREE.GridHelper(12, 20, 0x00d4ff, 0x1a1a2e);
+        gridHelper.position.y = -2.24;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.5;
         scene.add(gridHelper);
+        
+        // === PARTICULES ATMOSPHÉRIQUES ===
+        let particleCount = 100;
+        let particleVelocities = [];
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+            particlePositions[i * 3] = (Math.random() - 0.5) * 50;
+            particlePositions[i * 3 + 1] = Math.random() * 30 - 10;
+            particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+            
+            particleVelocities.push({
+                x: (Math.random() - 0.5) * 0.02,
+                y: Math.random() * 0.02 + 0.01,
+                z: (Math.random() - 0.5) * 0.02
+            });
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            color: 0x00d4ff,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleSystem);
         
         // Groupe viewmodel attaché à la caméra
         const viewmodelGroup = new THREE.Group();
@@ -580,93 +691,200 @@
         leftArm.castShadow = true;
         viewmodelGroup.add(leftArm);
         
-        // === CRÉATION DU KARAMBIT ===
+        // === KARAMBIT ULTRA-RÉALISTE (Style Rivals) ===
         const knifeGroup = new THREE.Group();
         
-        // Matériaux
-        const bladeMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0xe8e8e8,
-            metalness: 0.95,
-            roughness: 0.15,
-            emissive: 0x222222,
-            emissiveIntensity: 0.1
+        // Matériaux de haute qualité (déclarés globalement pour animations)
+        let bladeMaterial, bladeEdgeMaterial, handleMaterial, handleGripMaterial, goldAccentMaterial, glowMaterial, sparkleMaterial;
+        
+        bladeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xf0f0f0,
+            metalness: 0.98,
+            roughness: 0.12,
+            emissive: 0x111111,
+            emissiveIntensity: 0.15,
+            envMapIntensity: 1.5
         });
         
-        const edgeMaterial = new THREE.MeshStandardMaterial({ 
+        bladeEdgeMaterial = new THREE.MeshStandardMaterial({ 
             color: 0xffffff,
             metalness: 1.0,
             roughness: 0.05,
-            emissive: 0x444444,
-            emissiveIntensity: 0.2
+            emissive: 0x333333,
+            emissiveIntensity: 0.25
         });
         
-        const handleMaterial = new THREE.MeshStandardMaterial({ 
+        handleMaterial = new THREE.MeshStandardMaterial({ 
             color: 0x0a0a0a,
-            roughness: 0.6,
-            metalness: 0.2
+            roughness: 0.5,
+            metalness: 0.3
         });
         
-        const goldMaterial = new THREE.MeshStandardMaterial({ 
+        handleGripMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a1a,
+            roughness: 0.8,
+            metalness: 0.1
+        });
+        
+        goldAccentMaterial = new THREE.MeshStandardMaterial({ 
             color: 0xffd700,
-            metalness: 0.9,
-            roughness: 0.2,
-            emissive: 0x442200,
-            emissiveIntensity: 0.3
+            metalness: 0.95,
+            roughness: 0.15,
+            emissive: 0x664400,
+            emissiveIntensity: 0.4
         });
         
-        // Lame courbée principale
-        const bladeMainGeometry = new THREE.BoxGeometry(0.03, 0.35, 0.08);
-        const bladeMain = new THREE.Mesh(bladeMainGeometry, bladeMaterial);
-        bladeMain.position.set(0, -0.15, 0);
-        bladeMain.rotation.z = 0.4;
-        knifeGroup.add(bladeMain);
+        // === LAME PRINCIPALE (Forme courbée réaliste) ===
+        // Créer la courbure de la lame par segments
+        const bladeSegments = [];
+        const numSegments = 8;
         
-        // Pointe recourbée
-        const bladeTipGeometry = new THREE.BoxGeometry(0.025, 0.15, 0.07);
-        const bladeTip = new THREE.Mesh(bladeTipGeometry, bladeMaterial);
-        bladeTip.position.set(0.12, -0.28, 0);
-        bladeTip.rotation.z = -0.3;
-        knifeGroup.add(bladeTip);
+        for (let i = 0; i < numSegments; i++) {
+            const progress = i / numSegments;
+            const curve = Math.sin(progress * Math.PI * 0.6) * 0.15;
+            
+            const segmentGeo = new THREE.BoxGeometry(0.025, 0.055, 0.08);
+            const segment = new THREE.Mesh(segmentGeo, bladeMaterial);
+            
+            segment.position.y = -0.05 - (progress * 0.32);
+            segment.position.x = curve;
+            segment.rotation.z = progress * 0.5 + 0.2;
+            
+            knifeGroup.add(segment);
+            bladeSegments.push(segment);
+        }
         
-        // Tranchant
-        const edgeGeometry = new THREE.BoxGeometry(0.015, 0.35, 0.01);
-        const edge = new THREE.Mesh(edgeGeometry, edgeMaterial);
-        edge.position.set(0.015, -0.15, 0.035);
-        edge.rotation.z = 0.4;
+        // Pointe acérée (bout du karambit)
+        const tipGeo = new THREE.ConeGeometry(0.04, 0.12, 4);
+        const tip = new THREE.Mesh(tipGeo, bladeEdgeMaterial);
+        tip.position.set(0.15, -0.35, 0);
+        tip.rotation.z = -0.7;
+        knifeGroup.add(tip);
+        
+        // Tranchant brillant sur toute la longueur
+        const edgeCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0.02, 0, 0.04),
+            new THREE.Vector3(0.05, -0.1, 0.04),
+            new THREE.Vector3(0.08, -0.2, 0.04),
+            new THREE.Vector3(0.12, -0.3, 0.04),
+            new THREE.Vector3(0.14, -0.35, 0.04)
+        ]);
+        
+        const edgeGeo = new THREE.TubeGeometry(edgeCurve, 20, 0.008, 3, false);
+        const edge = new THREE.Mesh(edgeGeo, bladeEdgeMaterial);
         knifeGroup.add(edge);
         
-        // Manche
-        const handleGeometry = new THREE.BoxGeometry(0.05, 0.2, 0.08);
-        const handle = new THREE.Mesh(handleGeometry, handleMaterial);
-        handle.position.set(0, 0.08, 0);
-        knifeGroup.add(handle);
+        // Détails sur la lame (lignes de style)
+        for (let i = 0; i < 3; i++) {
+            const lineGeo = new THREE.BoxGeometry(0.015, 0.25, 0.002);
+            const line = new THREE.Mesh(lineGeo, new THREE.MeshStandardMaterial({
+                color: 0x444444,
+                metalness: 0.9,
+                roughness: 0.3
+            }));
+            line.position.set(-0.02 - i * 0.01, -0.15, 0.02);
+            line.rotation.z = 0.3;
+            knifeGroup.add(line);
+        }
         
-        // Bandes dorées
-        const goldBandGeometry = new THREE.BoxGeometry(0.052, 0.025, 0.082);
-        const goldBand1 = new THREE.Mesh(goldBandGeometry, goldMaterial);
-        goldBand1.position.set(0, 0.05, 0);
-        knifeGroup.add(goldBand1);
+        // === GARDE (Transition lame-manche) ===
+        const guardGeo = new THREE.BoxGeometry(0.08, 0.04, 0.1);
+        const guard = new THREE.Mesh(guardGeo, goldAccentMaterial);
+        guard.position.set(0, 0.02, 0);
+        knifeGroup.add(guard);
         
-        const goldBand2 = new THREE.Mesh(goldBandGeometry, goldMaterial);
-        goldBand2.position.set(0, 0.12, 0);
-        knifeGroup.add(goldBand2);
+        // === MANCHE (Grip détaillé) ===
+        // Base du manche
+        const handleBaseGeo = new THREE.BoxGeometry(0.055, 0.22, 0.09);
+        const handleBase = new THREE.Mesh(handleBaseGeo, handleMaterial);
+        handleBase.position.set(0, 0.12, 0);
+        knifeGroup.add(handleBase);
         
-        // Anneau
-        const ringGeometry = new THREE.TorusGeometry(0.045, 0.012, 8, 16);
-        const ring = new THREE.Mesh(ringGeometry, goldMaterial);
-        ring.position.set(0, 0.22, 0);
+        // Texture grip (lignes croisées)
+        for (let i = 0; i < 6; i++) {
+            const gripLineGeo = new THREE.BoxGeometry(0.057, 0.012, 0.091);
+            const gripLine = new THREE.Mesh(gripLineGeo, handleGripMaterial);
+            gripLine.position.set(0, 0.04 + i * 0.03, 0);
+            knifeGroup.add(gripLine);
+        }
+        
+        // Rivets dorés (3 de chaque côté)
+        for (let i = 0; i < 3; i++) {
+            const rivetGeo = new THREE.SphereGeometry(0.01, 8, 8);
+            
+            const rivet1 = new THREE.Mesh(rivetGeo, goldAccentMaterial);
+            rivet1.position.set(0.015, 0.06 + i * 0.06, 0.047);
+            knifeGroup.add(rivet1);
+            
+            const rivet2 = new THREE.Mesh(rivetGeo, goldAccentMaterial);
+            rivet2.position.set(0.015, 0.06 + i * 0.06, -0.047);
+            knifeGroup.add(rivet2);
+        }
+        
+        // Bande dorée centrale
+        const centerBandGeo = new THREE.BoxGeometry(0.058, 0.03, 0.092);
+        const centerBand = new THREE.Mesh(centerBandGeo, goldAccentMaterial);
+        centerBand.position.set(0, 0.12, 0);
+        knifeGroup.add(centerBand);
+        
+        // === POMEAU (Fin du manche) ===
+        const pommelGeo = new THREE.CylinderGeometry(0.05, 0.04, 0.025, 8);
+        const pommel = new THREE.Mesh(pommelGeo, goldAccentMaterial);
+        pommel.position.set(0, 0.235, 0);
+        pommel.rotation.x = Math.PI / 2;
+        knifeGroup.add(pommel);
+        
+        // === ANNEAU SIGNATURE DU KARAMBIT ===
+        const ringGeo = new THREE.TorusGeometry(0.055, 0.015, 12, 24);
+        const ring = new THREE.Mesh(ringGeo, goldAccentMaterial);
+        ring.position.set(0, 0.27, 0);
         ring.rotation.x = Math.PI / 2;
         knifeGroup.add(ring);
         
-        // Rivets
-        const rivetGeometry = new THREE.SphereGeometry(0.008, 8, 8);
-        const rivet1 = new THREE.Mesh(rivetGeometry, goldMaterial);
-        rivet1.position.set(0, 0.08, 0.042);
-        knifeGroup.add(rivet1);
+        // Détails sur l'anneau (gravures)
+        const ringDetailGeo = new THREE.TorusGeometry(0.056, 0.004, 8, 24);
+        const ringDetail = new THREE.Mesh(ringDetailGeo, new THREE.MeshStandardMaterial({
+            color: 0xffaa00,
+            metalness: 1.0,
+            roughness: 0.2,
+            emissive: 0xff8800,
+            emissiveIntensity: 0.3
+        }));
+        ringDetail.position.set(0, 0.27, 0);
+        ringDetail.rotation.x = Math.PI / 2;
+        knifeGroup.add(ringDetail);
         
-        const rivet2 = new THREE.Mesh(rivetGeometry, goldMaterial);
-        rivet2.position.set(0, 0.08, -0.042);
-        knifeGroup.add(rivet2);
+        // === EFFETS VISUELS (Style Rivals) ===
+        // Glow effect autour de la lame
+        const glowGeo = new THREE.BoxGeometry(0.04, 0.35, 0.1);
+        glowMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00d4ff,
+            transparent: true,
+            opacity: 0.15,
+            side: THREE.DoubleSide
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMaterial);
+        glow.position.set(0.04, -0.15, 0);
+        glow.rotation.z = 0.3;
+        knifeGroup.add(glow);
+        
+        // Particules d'éclat sur la lame
+        const sparkleGeo = new THREE.SphereGeometry(0.008, 4, 4);
+        sparkleMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8
+        });
+        
+        for (let i = 0; i < 5; i++) {
+            const sparkle = new THREE.Mesh(sparkleGeo, sparkleMaterial);
+            sparkle.position.set(
+                Math.random() * 0.08 - 0.02,
+                -0.05 - Math.random() * 0.3,
+                0.04
+            );
+            knifeGroup.add(sparkle);
+        }
         
         // Position du couteau
         knifeGroup.position.set(0.35, -0.28, -0.45);
@@ -1013,12 +1231,50 @@
             
             updateKnifeAnimation(deltaTime, time);
             
+            // Animation des reflets sur la lame
             const pulseIntensity = (Math.sin(time * 2) + 1) * 0.15;
-            bladeMaterial.emissiveIntensity = 0.1 + pulseIntensity;
-            edgeMaterial.emissiveIntensity = 0.2 + pulseIntensity;
+            bladeMaterial.emissiveIntensity = 0.15 + pulseIntensity * 0.5;
+            bladeEdgeMaterial.emissiveIntensity = 0.25 + pulseIntensity;
             
+            // Animation de l'or
             const goldPulse = (Math.sin(time * 1.5) + 1) * 0.2;
-            goldMaterial.emissiveIntensity = 0.3 + goldPulse;
+            goldAccentMaterial.emissiveIntensity = 0.4 + goldPulse * 0.3;
+            
+            // Animation du glow cyan
+            glowMaterial.opacity = 0.15 + Math.sin(time * 3) * 0.08;
+            
+            // Animation des sparkles (scintillement)
+            knifeGroup.children.forEach((child, index) => {
+                if (child.material === sparkleMaterial) {
+                    child.material.opacity = 0.3 + Math.sin(time * 5 + index) * 0.5;
+                    child.scale.set(
+                        1 + Math.sin(time * 4 + index) * 0.3,
+                        1 + Math.sin(time * 4 + index) * 0.3,
+                        1 + Math.sin(time * 4 + index) * 0.3
+                    );
+                }
+            });
+            
+            // Animation des particules atmosphériques
+            const positions = particleSystem.geometry.attributes.position.array;
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] += particleVelocities[i].x;
+                positions[i * 3 + 1] += particleVelocities[i].y;
+                positions[i * 3 + 2] += particleVelocities[i].z;
+                
+                // Reset si trop haut
+                if (positions[i * 3 + 1] > 30) {
+                    positions[i * 3 + 1] = -10;
+                }
+                
+                // Boucle horizontale
+                if (Math.abs(positions[i * 3]) > 25) positions[i * 3] *= -0.9;
+                if (Math.abs(positions[i * 3 + 2]) > 25) positions[i * 3 + 2] *= -0.9;
+            }
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+            
+            // Rotation lente du système de particules
+            particleSystem.rotation.y += 0.0002;
             
             renderer.render(scene, camera);
         }
