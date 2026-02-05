@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bras R6 Roblox 3D</title>
+    <title>FPS Karambit Pro</title>
     <style>
         * {
             margin: 0;
@@ -27,11 +27,12 @@
             top: 20px;
             left: 20px;
             color: white;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             padding: 20px;
             border-radius: 10px;
             backdrop-filter: blur(10px);
-            max-width: 300px;
+            max-width: 320px;
+            z-index: 1000;
         }
         
         .info-panel h2 {
@@ -40,10 +41,10 @@
             color: #00d4ff;
         }
         
-        .info-panel p {
-            margin: 8px 0;
-            font-size: 14px;
-            line-height: 1.5;
+        .info-panel h3 {
+            margin: 15px 0 10px 0;
+            color: #00d4ff;
+            font-size: 18px;
         }
         
         .control-item {
@@ -71,7 +72,7 @@
             <span class="icon">⌨️</span>
             <span>ZQSD / WASD pour bouger</span>
         </div>
-        <h3 style="margin: 15px 0 10px 0; color: #00d4ff; font-size: 18px;">🎬 Animations Premium:</h3>
+        <h3>🎬 Animations Premium:</h3>
         <div class="control-item">
             <span class="icon">🔍</span>
             <span><strong>F</strong> - Inspect (5 phases)</span>
@@ -112,7 +113,6 @@
             1000
         );
         camera.position.set(0, 0, 0);
-        camera.lookAt(0, 0, -5);
         
         // Renderer
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -128,15 +128,13 @@
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(5, 5, 5);
         directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
         scene.add(directionalLight);
         
         const pointLight = new THREE.PointLight(0xffffff, 0.5);
         pointLight.position.set(-5, 3, -5);
         scene.add(pointLight);
         
-        // Base plate (plateforme)
+        // Base plate
         const platformGeometry = new THREE.BoxGeometry(8, 0.3, 8);
         const platformMaterial = new THREE.MeshStandardMaterial({ 
             color: 0x4a4a4a,
@@ -148,7 +146,7 @@
         platform.receiveShadow = true;
         scene.add(platform);
         
-        // Grille au sol
+        // Grille
         const gridHelper = new THREE.GridHelper(10, 10, 0x666666, 0x444444);
         gridHelper.position.y = -2.35;
         scene.add(gridHelper);
@@ -165,14 +163,14 @@
             metalness: 0.2
         });
         
-        // BRAS DROIT (bloc R6)
+        // BRAS DROIT
         const rightArmGeometry = new THREE.BoxGeometry(0.15, 0.8, 0.15);
         const rightArm = new THREE.Mesh(rightArmGeometry, armMaterial);
         rightArm.position.set(0.25, -0.3, -0.5);
         rightArm.castShadow = true;
         viewmodelGroup.add(rightArm);
         
-        // BRAS GAUCHE (bloc R6)
+        // BRAS GAUCHE
         const leftArmGeometry = new THREE.BoxGeometry(0.15, 0.8, 0.15);
         const leftArm = new THREE.Mesh(leftArmGeometry, armMaterial);
         leftArm.position.set(-0.25, -0.3, -0.5);
@@ -182,13 +180,35 @@
         // === CRÉATION DU KARAMBIT ===
         const knifeGroup = new THREE.Group();
         
-        // Lame principale (argentée brillante)
+        // Matériaux
         const bladeMaterial = new THREE.MeshStandardMaterial({ 
             color: 0xe8e8e8,
             metalness: 0.95,
             roughness: 0.15,
             emissive: 0x222222,
             emissiveIntensity: 0.1
+        });
+        
+        const edgeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xffffff,
+            metalness: 1.0,
+            roughness: 0.05,
+            emissive: 0x444444,
+            emissiveIntensity: 0.2
+        });
+        
+        const handleMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x0a0a0a,
+            roughness: 0.6,
+            metalness: 0.2
+        });
+        
+        const goldMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xffd700,
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: 0x442200,
+            emissiveIntensity: 0.3
         });
         
         // Lame courbée principale
@@ -205,59 +225,37 @@
         bladeTip.rotation.z = -0.3;
         knifeGroup.add(bladeTip);
         
-        // Tranchant (partie brillante)
-        const edgeMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0xffffff,
-            metalness: 1.0,
-            roughness: 0.05,
-            emissive: 0x444444,
-            emissiveIntensity: 0.2
-        });
+        // Tranchant
         const edgeGeometry = new THREE.BoxGeometry(0.015, 0.35, 0.01);
         const edge = new THREE.Mesh(edgeGeometry, edgeMaterial);
         edge.position.set(0.015, -0.15, 0.035);
         edge.rotation.z = 0.4;
         knifeGroup.add(edge);
         
-        // Manche noir avec texture
-        const handleMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x0a0a0a,
-            roughness: 0.6,
-            metalness: 0.2
-        });
+        // Manche
         const handleGeometry = new THREE.BoxGeometry(0.05, 0.2, 0.08);
         const handle = new THREE.Mesh(handleGeometry, handleMaterial);
         handle.position.set(0, 0.08, 0);
         knifeGroup.add(handle);
         
-        // Détails dorés sur le manche
-        const goldMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0xffd700,
-            metalness: 0.9,
-            roughness: 0.2,
-            emissive: 0x442200,
-            emissiveIntensity: 0.3
-        });
-        
-        // Bande dorée 1
-        const goldBand1Geometry = new THREE.BoxGeometry(0.052, 0.025, 0.082);
-        const goldBand1 = new THREE.Mesh(goldBand1Geometry, goldMaterial);
+        // Bandes dorées
+        const goldBandGeometry = new THREE.BoxGeometry(0.052, 0.025, 0.082);
+        const goldBand1 = new THREE.Mesh(goldBandGeometry, goldMaterial);
         goldBand1.position.set(0, 0.05, 0);
         knifeGroup.add(goldBand1);
         
-        // Bande dorée 2
-        const goldBand2 = new THREE.Mesh(goldBand1Geometry, goldMaterial);
+        const goldBand2 = new THREE.Mesh(goldBandGeometry, goldMaterial);
         goldBand2.position.set(0, 0.12, 0);
         knifeGroup.add(goldBand2);
         
-        // Anneau du karambit (signature)
+        // Anneau
         const ringGeometry = new THREE.TorusGeometry(0.045, 0.012, 8, 16);
         const ring = new THREE.Mesh(ringGeometry, goldMaterial);
         ring.position.set(0, 0.22, 0);
         ring.rotation.x = Math.PI / 2;
         knifeGroup.add(ring);
         
-        // Rivet décoratif
+        // Rivets
         const rivetGeometry = new THREE.SphereGeometry(0.008, 8, 8);
         const rivet1 = new THREE.Mesh(rivetGeometry, goldMaterial);
         rivet1.position.set(0, 0.08, 0.042);
@@ -267,12 +265,12 @@
         rivet2.position.set(0, 0.08, -0.042);
         knifeGroup.add(rivet2);
         
-        // Position du couteau dans la main droite (mieux tenu, pas dans le bras)
+        // Position du couteau
         knifeGroup.position.set(0.35, -0.28, -0.45);
         knifeGroup.rotation.set(-0.1, 0.4, 0.3);
         viewmodelGroup.add(knifeGroup);
         
-        // Contrôles première personne
+        // === CONTRÔLES ===
         let mouseX = 0;
         let mouseY = 0;
         let targetRotationX = 0;
@@ -282,16 +280,13 @@
             mouseX = (e.clientX / window.innerWidth) * 2 - 1;
             mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
             
-            // Contrôles corrigés
             targetRotationY = -mouseX * Math.PI * 0.5;
-            targetRotationX = mouseY * Math.PI * 0.3; // Corrigé : pas d'inversion
+            targetRotationX = mouseY * Math.PI * 0.3;
         });
         
-        // Mouvement avec les touches ZQSD / WASD
         const keys = {};
         const moveSpeed = 0.1;
         
-        // Variables pour les animations du couteau
         let currentAnimation = 'idle';
         let animationProgress = 0;
         let animationDuration = 0;
@@ -301,7 +296,6 @@
         document.addEventListener('keydown', (e) => {
             keys[e.key.toLowerCase()] = true;
             
-            // Animations du couteau
             if (e.key.toLowerCase() === 'f' && currentAnimation === 'idle') {
                 currentAnimation = 'inspect';
                 animationProgress = 0;
@@ -322,15 +316,15 @@
                 animationProgress = 0;
                 animationDuration = 3.2;
             }
-            if (e.key.toLowerCase() === 'c' && currentAnimation === 'idle') {
-                currentAnimation = 'cinematic';
-                animationProgress = 0;
-                animationDuration = 6.0;
-            }
             if (e.key.toLowerCase() === 't' && currentAnimation === 'idle') {
                 currentAnimation = 'juggle';
                 animationProgress = 0;
                 animationDuration = 4.0;
+            }
+            if (e.key.toLowerCase() === 'c' && currentAnimation === 'idle') {
+                currentAnimation = 'cinematic';
+                animationProgress = 0;
+                animationDuration = 6.0;
             }
         });
         
@@ -364,7 +358,7 @@
             }
         }
         
-        // Fonction d'easing pour des animations fluides
+        // Easing functions
         function easeInOutCubic(t) {
             return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         }
@@ -374,7 +368,175 @@
             return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
         }
         
-
+        function easeOutBack(t) {
+            const c1 = 1.70158;
+            const c3 = c1 + 1;
+            return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+        }
+        
+        function smoothLerp(start, end, t) {
+            return start + (end - start) * t;
+        }
+        
+        function resetKnifePosition() {
+            knifeGroup.position.set(0.35, -0.28, -0.45);
+            knifeGroup.rotation.set(-0.1, 0.4, 0.3);
+        }
+        
+        function updateKnifeAnimation(deltaTime, time) {
+            if (currentAnimation === 'idle') {
+                resetKnifePosition();
+                knifeGroup.rotation.y = 0.4 + Math.sin(time * 0.7) * 0.02;
+                knifeGroup.rotation.z = 0.3 + Math.sin(time * 0.9) * 0.015;
+                targetFOV = 75;
+                return;
+            }
+            
+            animationProgress += deltaTime;
+            const progress = Math.min(animationProgress / animationDuration, 1);
+            
+            if (currentAnimation === 'inspect') {
+                if (progress < 0.25) {
+                    const phase = easeInOutCubic(progress / 0.25);
+                    knifeGroup.position.x = smoothLerp(0.35, 0, phase);
+                    knifeGroup.position.y = smoothLerp(-0.28, -0.05, phase);
+                    knifeGroup.position.z = smoothLerp(-0.45, -0.3, phase);
+                    knifeGroup.rotation.x = smoothLerp(-0.1, 0.5, phase);
+                    knifeGroup.rotation.y = smoothLerp(0.4, 0, phase);
+                    rightArm.position.x = smoothLerp(0.25, 0.15, phase);
+                    leftArm.position.x = smoothLerp(-0.25, -0.15, phase);
+                    targetFOV = smoothLerp(75, 70, phase);
+                } else if (progress < 0.75) {
+                    const phase = (progress - 0.25) / 0.5;
+                    const rotations = phase * Math.PI * 3;
+                    knifeGroup.position.set(0, -0.05, -0.3);
+                    knifeGroup.rotation.x = 0.5 + Math.sin(rotations) * 0.3;
+                    knifeGroup.rotation.y = rotations;
+                    knifeGroup.rotation.z = Math.cos(rotations * 0.5) * 0.2;
+                    targetFOV = 70;
+                } else {
+                    const phase = easeOutBack((progress - 0.75) / 0.25);
+                    knifeGroup.position.x = smoothLerp(0, 0.35, phase);
+                    knifeGroup.position.y = smoothLerp(-0.05, -0.28, phase);
+                    knifeGroup.position.z = smoothLerp(-0.3, -0.45, phase);
+                    knifeGroup.rotation.x = smoothLerp(0.5, -0.1, phase);
+                    knifeGroup.rotation.y = smoothLerp(Math.PI * 1.5, 0.4, phase);
+                    rightArm.position.x = smoothLerp(0.15, 0.25, phase);
+                    leftArm.position.x = smoothLerp(-0.15, -0.25, phase);
+                    targetFOV = smoothLerp(70, 75, phase);
+                }
+            }
+            
+            else if (currentAnimation === 'spin') {
+                const spinRotations = easeOutElastic(progress) * Math.PI * 12;
+                const shake = Math.sin(progress * Math.PI) * 0.06;
+                knifeGroup.position.x = 0.35 + Math.cos(spinRotations * 4) * shake;
+                knifeGroup.position.y = -0.28 + Math.sin(progress * Math.PI) * 0.1;
+                knifeGroup.rotation.y = 0.4 + spinRotations;
+                rightArm.rotation.x = Math.sin(progress * Math.PI) * 0.5;
+                targetFOV = 75 + shake * 80;
+            }
+            
+            else if (currentAnimation === 'flip') {
+                const parabola = Math.sin(progress * Math.PI);
+                if (progress < 0.35) {
+                    const phase = easeInOutCubic(progress / 0.35);
+                    knifeGroup.position.y = smoothLerp(-0.28, -0.1, phase);
+                    knifeGroup.rotation.x = smoothLerp(-0.1, 1.5, phase);
+                    rightArm.rotation.x = -phase * 0.8;
+                } else if (progress < 0.7) {
+                    const phase = (progress - 0.35) / 0.35;
+                    knifeGroup.position.y = -0.1 + Math.sin(phase * Math.PI) * 0.5;
+                    knifeGroup.rotation.x = 1.5 + phase * Math.PI * 4;
+                    targetFOV = 68 + Math.sin(phase * Math.PI) * 8;
+                } else {
+                    const phase = easeOutBack((progress - 0.7) / 0.3);
+                    knifeGroup.position.y = smoothLerp(0.4, -0.28, phase);
+                    knifeGroup.rotation.x = smoothLerp(1.5 + Math.PI * 1.4, -0.1, phase);
+                    rightArm.rotation.x = smoothLerp(-0.5, 0, phase);
+                    targetFOV = smoothLerp(76, 75, phase);
+                }
+            }
+            
+            else if (currentAnimation === 'twirl') {
+                const twirls = progress * Math.PI * 10;
+                const spiral = progress * Math.PI * 3;
+                const spiralRadius = 0.15 * Math.sin(progress * Math.PI);
+                knifeGroup.position.x = 0.35 + Math.cos(spiral) * spiralRadius;
+                knifeGroup.position.y = -0.28 + Math.sin(spiral) * spiralRadius * 0.7;
+                knifeGroup.rotation.x = -0.1 + Math.sin(twirls * 1.4) * 0.9;
+                knifeGroup.rotation.y = 0.4 + twirls * 1.3;
+                knifeGroup.rotation.z = 0.3 + Math.cos(twirls) * 0.7;
+                rightArm.rotation.x = Math.sin(spiral) * 0.4;
+                rightArm.rotation.y = Math.sin(twirls * 0.5) * 0.45;
+                targetFOV = 75 + Math.sin(twirls * 0.3) * 4;
+            }
+            
+            else if (currentAnimation === 'juggle') {
+                const juggleCycle = progress * 4;
+                const isRightHand = Math.floor(juggleCycle) % 2 === 0;
+                const phaseInCycle = juggleCycle % 1;
+                const arc = Math.sin(phaseInCycle * Math.PI);
+                
+                if (isRightHand) {
+                    knifeGroup.position.x = smoothLerp(0.35, -0.25, phaseInCycle);
+                } else {
+                    knifeGroup.position.x = smoothLerp(-0.25, 0.35, phaseInCycle);
+                }
+                knifeGroup.position.y = -0.28 + arc * 0.4;
+                knifeGroup.rotation.x = -0.1 + phaseInCycle * Math.PI * 2;
+                targetFOV = 75 + arc * 5;
+            }
+            
+            else if (currentAnimation === 'cinematic') {
+                if (progress < 0.2) {
+                    const phase = easeInOutCubic(progress / 0.2);
+                    knifeGroup.position.x = smoothLerp(0.35, 0, phase);
+                    knifeGroup.position.y = smoothLerp(-0.28, 0, phase);
+                    knifeGroup.position.z = smoothLerp(-0.45, -0.25, phase);
+                    knifeGroup.rotation.x = -0.1 + phase * Math.PI * 2;
+                    targetFOV = smoothLerp(75, 60, phase);
+                } else if (progress < 0.4) {
+                    const phase = (progress - 0.2) / 0.2;
+                    const spinRot = phase * Math.PI * 6;
+                    knifeGroup.position.set(0, 0, -0.25);
+                    knifeGroup.rotation.y = 0.4 + spinRot;
+                    targetFOV = 60 - Math.abs(Math.sin(spinRot)) * 5;
+                } else if (progress < 0.6) {
+                    const phase = (progress - 0.4) / 0.2;
+                    const arc = Math.sin(phase * Math.PI);
+                    knifeGroup.position.y = arc * 0.6;
+                    knifeGroup.rotation.x = Math.PI * 2 + phase * Math.PI * 5;
+                    targetFOV = 55 + arc * 10;
+                } else if (progress < 0.8) {
+                    const phase = easeOutBack((progress - 0.6) / 0.2);
+                    const twirlRot = (progress - 0.6) * 40;
+                    knifeGroup.position.y = smoothLerp(0.6, -0.15, phase);
+                    knifeGroup.rotation.y = 0.4 + twirlRot;
+                    targetFOV = smoothLerp(65, 68, phase);
+                } else {
+                    const phase = easeInOutCubic((progress - 0.8) / 0.2);
+                    knifeGroup.position.x = smoothLerp(0, 0.35, phase);
+                    knifeGroup.position.y = smoothLerp(-0.15, -0.28, phase);
+                    knifeGroup.position.z = smoothLerp(-0.25, -0.45, phase);
+                    knifeGroup.rotation.x = smoothLerp(0, -0.1, phase);
+                    targetFOV = smoothLerp(68, 75, phase);
+                }
+            }
+            
+            if (progress >= 1) {
+                currentAnimation = 'idle';
+                animationProgress = 0;
+                resetKnifePosition();
+                rightArm.rotation.set(0, 0, 0);
+                leftArm.rotation.set(0, 0, 0);
+                rightArm.position.set(0.25, -0.3, -0.5);
+                leftArm.position.set(-0.25, -0.3, -0.5);
+                viewmodelGroup.position.set(0, 0, 0);
+                viewmodelGroup.rotation.set(0, 0, 0);
+                targetFOV = 75;
+            }
+        }
         
         // Animation
         let currentRotationX = 0;
@@ -391,13 +553,10 @@
             lastTime = currentTime;
             const time = currentTime * 0.001;
             
-            // Détection du mouvement
             isMoving = keys['z'] || keys['w'] || keys['s'] || keys['q'] || keys['a'] || keys['d'];
             
-            // Mouvement ZQSD
             updateMovement();
             
-            // Interpolation douce de la rotation de la caméra
             currentRotationX += (targetRotationX - currentRotationX) * 0.1;
             currentRotationY += (targetRotationY - currentRotationY) * 0.1;
             
@@ -405,33 +564,25 @@
             camera.rotation.y = currentRotationY;
             camera.rotation.x = currentRotationX;
             
-            // FOV dynamique
             cameraFOV += (targetFOV - cameraFOV) * 0.1;
             camera.fov = cameraFOV;
             camera.updateProjectionMatrix();
             
-            // === ANIMATIONS DU VIEWMODEL ===
-            
-            // Balancement de marche (head bobbing) - seulement si pas d'animation de couteau
             if (isMoving && currentAnimation === 'idle') {
                 bobPhase += 0.15;
                 const bobY = Math.sin(bobPhase) * 0.015;
                 const bobX = Math.cos(bobPhase * 0.5) * 0.01;
                 viewmodelGroup.position.y = bobY;
                 viewmodelGroup.position.x = bobX;
-                
-                // Balancement des bras pendant la marche
                 rightArm.rotation.x = Math.sin(bobPhase) * 0.1;
                 leftArm.rotation.x = Math.sin(bobPhase + Math.PI) * 0.1;
             } else if (currentAnimation === 'idle') {
-                // Retour à la position de repos
                 viewmodelGroup.position.y += (0 - viewmodelGroup.position.y) * 0.1;
                 viewmodelGroup.position.x += (0 - viewmodelGroup.position.x) * 0.1;
                 rightArm.rotation.x += (0 - rightArm.rotation.x) * 0.1;
                 leftArm.rotation.x += (0 - leftArm.rotation.x) * 0.1;
             }
             
-            // Balancement idle subtil (breathing effect) - seulement si pas d'animation
             if (currentAnimation === 'idle') {
                 const idleSwayY = Math.sin(time * 0.8) * 0.005;
                 const idleSwayX = Math.cos(time * 0.5) * 0.003;
@@ -439,29 +590,24 @@
                 viewmodelGroup.rotation.x += (idleSwayY - viewmodelGroup.rotation.x) * 0.1;
             }
             
-            // Animation du couteau
             updateKnifeAnimation(deltaTime, time);
             
-            // Animation de reflet sur la lame
             const pulseIntensity = (Math.sin(time * 2) + 1) * 0.15;
             bladeMaterial.emissiveIntensity = 0.1 + pulseIntensity;
             edgeMaterial.emissiveIntensity = 0.2 + pulseIntensity;
             
-            // Animation de brillance sur l'or
             const goldPulse = (Math.sin(time * 1.5) + 1) * 0.2;
             goldMaterial.emissiveIntensity = 0.3 + goldPulse;
             
             renderer.render(scene, camera);
         }
         
-        // Gestion du redimensionnement
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
         
-        // Démarrage de l'animation
         animate();
     </script>
 </body>
